@@ -4,11 +4,10 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import LoginScreen from '../screens/LoginScreen';
-import HomeScreen from '../screens/HomeScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import AppDrawer from './AppDrawer';
 
 const AuthStack = createStackNavigator();
-const AppStack = createStackNavigator();
 
 function AuthStackScreen() {
   return (
@@ -28,11 +27,7 @@ function AuthStackScreen() {
 }
 
 function AppStackScreen() {
-  return (
-    <AppStack.Navigator>
-      <AppStack.Screen name="Home" component={HomeScreen} />
-    </AppStack.Navigator>
-  );
+  return <AppDrawer />;
 }
 
 const MainNavigation = () => {
