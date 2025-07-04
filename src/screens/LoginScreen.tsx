@@ -9,12 +9,8 @@ import {
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import {login} from '../redux/slices/authSlice';
+import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
-
-type AuthStackParamList = {
-  Login: undefined;
-  SignUp: undefined;
-};
 
 interface LoginScreenProps {
   navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
