@@ -6,6 +6,7 @@ import {
   Button,
   TextInput,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
@@ -33,7 +34,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
       <Text style={styles.label}>Email</Text>
       <TextInput
@@ -70,7 +71,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
           color="#888"
         />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
