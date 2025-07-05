@@ -15,6 +15,7 @@ import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
 import NoteCard from '../components/NoteCard';
 import {addNote} from '../redux/slices/noteSlice';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 interface HomeScreenProps {
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
@@ -26,7 +27,7 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
   const notes = useSelector((state: RootState) => state.notes.notes);
 
   return (
-    <View style={{flex: 1, backgroundColor: '#fff'}}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View style={styles.headerContainer}>
         <TouchableOpacity
           onPress={() => navigation.toggleDrawer()}
@@ -93,7 +94,7 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         }}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

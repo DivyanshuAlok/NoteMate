@@ -6,6 +6,7 @@ import {
   Button,
   Image,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
@@ -24,7 +25,7 @@ const ProfilePage = ({navigation}: ProfilePageProps) => {
   const name = user ? user.split('@')[0] : 'User';
   const photoUrl = 'https://randomuser.me/api/portraits/men/1.jpg';
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TouchableOpacity
         style={styles.menuButton}
         onPress={() => navigation.toggleDrawer()}>
@@ -36,7 +37,7 @@ const ProfilePage = ({navigation}: ProfilePageProps) => {
       <Text style={styles.value}>{user}</Text>
       <Text style={{marginTop: 32}} />
       <Button title="Logout" onPress={() => dispatch(logout())} />
-    </View>
+    </SafeAreaView>
   );
 };
 
