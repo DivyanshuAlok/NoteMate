@@ -21,6 +21,7 @@ interface HomeScreenProps {
 const HomeScreen = ({navigation}: HomeScreenProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const notes = useSelector((state: RootState) => state.notes.notes);
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
@@ -45,7 +46,16 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         </TouchableOpacity>
       </View>
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <Text>Welcome, {user}!</Text>
+        {notes.length === 0 ? (
+          <>
+            <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
+              No notes here, please add a note.
+            </Text>
+            <View style={{height: 120}} />
+          </>
+        ) : (
+          <Text>Welcome, {user}!</Text>
+        )}
       </View>
       <TouchableOpacity
         style={styles.fab}
