@@ -13,6 +13,8 @@ import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
+import NoteCard from '../components/NoteCard';
+import {addNote} from '../redux/slices/noteSlice';
 
 interface HomeScreenProps {
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
@@ -45,22 +47,49 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
           />
         </TouchableOpacity>
       </View>
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={{flex: 1, alignItems: 'center', paddingVertical: 16}}>
         {notes.length === 0 ? (
-          <>
+          <View
+            style={{alignItems: 'center', justifyContent: 'center', flex: 0.8}}>
             <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
               No notes here, please add a note.
             </Text>
+          </View>
+        ) : (
+          <>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+              }}>
+              {notes.map(note => (
+                <NoteCard
+                  key={note.id}
+                  title={note.title}
+                  content={note.content}
+                  imageUrls={note.imageUrls || []}
+                />
+              ))}
+            </View>
             <View style={{height: 120}} />
           </>
-        ) : (
-          <Text>Welcome, {user}!</Text>
         )}
       </View>
       <TouchableOpacity
         style={styles.fab}
         onPress={() => {
-          /* handle add note */
+          const id = Date.now().toString();
+          dispatch(
+            addNote({
+              id,
+              title: 'New Note',
+              content: 'This is a new note.',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              imageUrls: [],
+            }),
+          );
         }}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>

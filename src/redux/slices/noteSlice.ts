@@ -6,7 +6,7 @@ export interface Note {
   content: string;
   pinned?: boolean;
   color?: string;
-  imageUrl?: string;
+  imageUrls?: string[];
   createdAt: string;
   updatedAt: string;
 }
