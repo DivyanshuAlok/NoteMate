@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignSelf: 'center',
-    paddingLeft: screenWidth * 0.125,
     marginBottom: Dimensions.get('window').height * 0.15, // 10% bottom indent},
   },
   input: {

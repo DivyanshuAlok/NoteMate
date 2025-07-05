@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignSelf: 'center',
-    paddingLeft: Dimensions.get('window').width * 0.125, // 12.5% left indent
     marginBottom: Dimensions.get('window').height * 0.15, // 10% bottom indent},
   },
   input: {
