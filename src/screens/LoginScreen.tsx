@@ -11,7 +11,9 @@ import {
   Keyboard,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
+import type {AppDispatch} from '../redux/store';
 import {login} from '../redux/slices/authSlice';
+import {loginThunk} from '../api/authThunks';
 import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
 
@@ -22,13 +24,19 @@ interface LoginScreenProps {
 const screenWidth = Dimensions.get('window').width;
 
 const LoginScreen = ({navigation}: LoginScreenProps) => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    // You can add validation here
-    dispatch(login(email));
+  const handleLogin = async () => {
+    setError('');
+    try {
+      await dispatch<any>(loginThunk({email, password})).unwrap();
+      navigation.replace('Home');
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    }
   };
 
   return (
@@ -54,6 +62,7 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
               secureTextEntry
               style={[styles.input, {marginBottom: 20}]}
             />
+            {!!error && <Text style={styles.errorText}>{error}</Text>}
             <View style={styles.button}>
               <Button title="Login" onPress={handleLogin} />
             </View>
@@ -113,6 +122,12 @@ const styles = StyleSheet.create({
     marginTop: 15, // Increased space between Login and Sign Up
     alignSelf: 'flex-start',
     backgroundColor: '#eee',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+    fontSize: 13,
   },
 });
 

@@ -12,6 +12,7 @@ import {
   Keyboard,
 } from 'react-native';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {useSignUp} from '../api/useSignUp';
 
 type AuthStackParamList = {
   Login: undefined;
@@ -26,12 +27,13 @@ interface SignUpScreenProps {
 const screenWidth = Dimensions.get('window').width;
 
 const SignUpScreen = ({navigation}: SignUpScreenProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('testuser@example.com');
+  const [password, setPassword] = useState('Test@1234');
+  const [confirmPassword, setConfirmPassword] = useState('Test@1234');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const signUpMutation = useSignUp();
 
   const validateEmail = (email: string) => {
     // Simple email regex
@@ -39,7 +41,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
     return re.test(email);
   };
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let valid = true;
     setEmailError('');
     setPasswordError('');
@@ -52,8 +54,12 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
       valid = false;
     }
     if (!valid) return;
-    // Add sign up logic here
-    navigation.replace('Login');
+    try {
+      await signUpMutation.mutateAsync({email, password});
+      navigation.replace('Login');
+    } catch (err: any) {
+      setEmailError(err.message || 'Sign up failed');
+    }
   };
 
   const handleConfirmPasswordBlur = () => {
