@@ -12,10 +12,9 @@ import {
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import type {AppDispatch} from '../redux/store';
-import {login} from '../redux/slices/authSlice';
-import {loginThunk} from '../api/authThunks';
 import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {loginThunk} from '../redux/authThunks';
 
 interface LoginScreenProps {
   navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
@@ -25,8 +24,8 @@ const screenWidth = Dimensions.get('window').width;
 
 const LoginScreen = ({navigation}: LoginScreenProps) => {
   const dispatch: AppDispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('testuser@example.com'); // Prefilled email
+  const [password, setPassword] = useState('Test@1234'); // Prefilled password
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
@@ -35,6 +34,8 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
       await dispatch<any>(loginThunk({email, password})).unwrap();
       navigation.replace('Home');
     } catch (err: any) {
+      console.log(err);
+
       setError(err.message || 'Login failed');
     }
   };
