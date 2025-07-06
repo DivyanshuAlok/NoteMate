@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import type {StackNavigationProp} from '@react-navigation/stack';
-import {useSignUp} from '../api/useSignUp';
+import {useSignUp} from '../hooks/useSignUp';
 
 type AuthStackParamList = {
   Login: undefined;
