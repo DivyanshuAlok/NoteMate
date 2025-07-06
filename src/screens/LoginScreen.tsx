@@ -9,12 +9,14 @@ import {
   SafeAreaView,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import type {AppDispatch} from '../redux/store';
 import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {loginThunk} from '../redux/authThunks';
+import {useLogin} from '../api/useLogin';
 
 interface LoginScreenProps {
   navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
@@ -27,16 +29,18 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   const [email, setEmail] = useState('testuser@example.com'); // Prefilled email
   const [password, setPassword] = useState('Test@1234'); // Prefilled password
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
 
   const handleLogin = async () => {
     setError('');
+    setLoading(true);
     try {
-      await dispatch<any>(loginThunk({email, password})).unwrap();
-      navigation.replace('Home');
+      await loginMutation.mutateAsync({email, password});
     } catch (err: any) {
-      console.log(err);
-
       setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +49,21 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
       <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}>
         <View style={styles.outerContainer}>
           <View style={styles.innerContainer}>
-            <Text style={styles.title}>Login Screen</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.title}>Login Screen</Text>
+              {loading && (
+                <ActivityIndicator
+                  size="large"
+                  color="#1976d2"
+                  style={{marginBottom: 20}}
+                />
+              )}
+            </View>
             <Text style={styles.label}>Email</Text>
             <TextInput
               placeholder="Email"

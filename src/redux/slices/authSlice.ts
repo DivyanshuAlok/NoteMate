@@ -1,48 +1,37 @@
+// redux/slices/authSlice.ts
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {loginThunk, refreshTokenThunk} from '../authThunks';
 
 interface AuthState {
   isAuthenticated: boolean;
   user: string | null;
+  jwt: string | null;
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
+  jwt: null,
 };
 
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<string>) => {
+    setAuth: (
+      state,
+      action: PayloadAction<{token: string; user: string | null}>,
+    ) => {
       state.isAuthenticated = true;
-      state.user = action.payload;
+      state.jwt = action.payload.token;
+      state.user = action.payload.user;
     },
     logout: state => {
       state.isAuthenticated = false;
+      state.jwt = null;
       state.user = null;
     },
   },
-  extraReducers: builder => {
-    builder
-      .addCase(loginThunk.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.user = action.payload?.user || null;
-      })
-      .addCase(loginThunk.rejected, state => {
-        state.isAuthenticated = false;
-        state.user = null;
-      })
-      .addCase(refreshTokenThunk.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-      })
-      .addCase(refreshTokenThunk.rejected, state => {
-        state.isAuthenticated = false;
-        state.user = null;
-      });
-  },
 });
 
-export const {login, logout} = authSlice.actions;
+export const {setAuth, logout} = authSlice.actions;
 export default authSlice.reducer;

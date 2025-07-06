@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import type {StackNavigationProp} from '@react-navigation/stack';
 import {useSignUp} from '../api/useSignUp';
@@ -75,7 +76,22 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
       <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}>
         <View style={styles.outerContainer}>
           <View style={styles.innerContainer}>
-            <Text style={styles.title}>Sign Up</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.title}>Sign Up</Text>
+              {signUpMutation.isPending && (
+                <ActivityIndicator
+                  size="large"
+                  color="#1976d2"
+                  style={{marginBottom: 20}}
+                />
+              )}
+            </View>
+
             <Text style={styles.label}>Email</Text>
             <TextInput
               placeholder="Email"
@@ -98,7 +114,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
               placeholder="Password"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
+              secureTextEntry={!showConfirmPassword}
               style={styles.input}
             />
             <Text style={styles.label}>Confirm Password</Text>
