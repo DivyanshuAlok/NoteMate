@@ -8,6 +8,15 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
@@ -19,6 +28,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import NoteEditModal from '../components/modals/NoteEditModal';
 
 interface HomeScreenProps {
+  navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
 }
 
