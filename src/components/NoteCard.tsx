@@ -57,6 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#444',
     marginBottom: 10,
+    maxWidth: '100%',
   },
   attachmentRow: {
     flexDirection: 'row',

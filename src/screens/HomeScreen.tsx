@@ -8,16 +8,27 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
 import NoteCard from '../components/NoteCard';
-import {addNote} from '../redux/slices/noteSlice';
+import {addNote, deleteNote, Note, updateNote} from '../redux/slices/noteSlice';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import NoteEditModal from '../components/modals/NoteEditModal';
 
 interface HomeScreenProps {
+  navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
 }
 
@@ -25,6 +36,8 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const notes = useSelector((state: RootState) => state.notes.notes);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [selectedNote, setSelectedNote] = React.useState<Note | null>(null);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
@@ -65,12 +78,18 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
                 justifyContent: 'center',
               }}>
               {notes.map(note => (
-                <NoteCard
+                <TouchableOpacity
                   key={note.id}
-                  title={note.title}
-                  content={note.content}
-                  imageUrls={note.imageUrls || []}
-                />
+                  onPress={() => {
+                    setSelectedNote(note);
+                    setModalVisible(true);
+                  }}>
+                  <NoteCard
+                    title={note.title}
+                    content={note.content}
+                    imageUrls={note.imageUrls || []}
+                  />
+                </TouchableOpacity>
               ))}
             </View>
             <View style={{height: 120}} />
@@ -94,6 +113,19 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         }}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
+      <NoteEditModal
+        visible={modalVisible}
+        note={selectedNote}
+        onClose={() => setModalVisible(false)}
+        onSave={updatedNote => {
+          dispatch(updateNote(updatedNote));
+          setModalVisible(false);
+        }}
+        onDelete={() => {
+          dispatch(deleteNote(selectedNote?.id || ''));
+          setModalVisible(false);
+        }}
+      />
     </SafeAreaView>
   );
 };

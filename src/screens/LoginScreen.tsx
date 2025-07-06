@@ -7,11 +7,16 @@ import {
   TextInput,
   Dimensions,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
-import {login} from '../redux/slices/authSlice';
+import type {AppDispatch} from '../redux/store';
 import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
+import {loginThunk} from '../redux/authThunks';
+import {useLogin} from '../api/useLogin';
 
 interface LoginScreenProps {
   navigation: StackNavigationProp<AuthStackParamList, 'Login'>;
@@ -20,57 +25,92 @@ interface LoginScreenProps {
 const screenWidth = Dimensions.get('window').width;
 
 const LoginScreen = ({navigation}: LoginScreenProps) => {
-  const dispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const dispatch: AppDispatch = useDispatch();
+  const [email, setEmail] = useState('testuser@example.com'); // Prefilled email
+  const [password, setPassword] = useState('Test@1234'); // Prefilled password
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
 
-  const handleLogin = () => {
-    // You can add validation here
-    dispatch(login(email));
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginMutation.mutateAsync({email, password});
+    } catch (err: any) {
+      setError(err.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Login Screen</Text>
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={[styles.input, {marginBottom: 20}]}
-      />
-      <View style={styles.button}>
-        <Button title="Login" onPress={handleLogin} />
-      </View>
-      <View style={styles.signupButton}>
-        <Button
-          title="Sign Up"
-          onPress={() => {
-            navigation.navigate('SignUp');
-          }}
-          color="#888"
-        />
-      </View>
+    <SafeAreaView style={{flex: 1}}>
+      <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}>
+        <View style={styles.outerContainer}>
+          <View style={styles.innerContainer}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <Text style={styles.title}>Login Screen</Text>
+              {loading && (
+                <ActivityIndicator
+                  size="large"
+                  color="#1976d2"
+                  style={{marginBottom: 20}}
+                />
+              )}
+            </View>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+            />
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={[styles.input, {marginBottom: 20}]}
+            />
+            {!!error && <Text style={styles.errorText}>{error}</Text>}
+            <View style={styles.button}>
+              <Button title="Login" onPress={handleLogin} />
+            </View>
+            <View style={styles.signupButton}>
+              <Button
+                title="Sign Up"
+                onPress={() => {
+                  navigation.navigate('SignUp');
+                }}
+                color="#888"
+              />
+            </View>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
+    flex: 1,
+    paddingBottom: Dimensions.get('window').height * 0.15,
+    width: '100%',
+  },
+  innerContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingLeft: Dimensions.get('window').width * 0.125, // 12.5% left indent
-    marginBottom: Dimensions.get('window').height * 0.15, // 10% bottom indent},
+    alignSelf: 'center',
   },
   input: {
     width: screenWidth * 0.75,
@@ -101,6 +141,12 @@ const styles = StyleSheet.create({
     marginTop: 15, // Increased space between Login and Sign Up
     alignSelf: 'flex-start',
     backgroundColor: '#eee',
+  },
+  errorText: {
+    color: 'red',
+    marginBottom: 8,
+    alignSelf: 'flex-start',
+    fontSize: 13,
   },
 });
 
