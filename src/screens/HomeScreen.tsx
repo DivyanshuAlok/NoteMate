@@ -8,15 +8,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {
-  View,
-  Text,
-  Button,
-  TextInput,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
@@ -29,7 +21,6 @@ import NoteEditModal from '../components/modals/NoteEditModal';
 
 interface HomeScreenProps {
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
-  navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
 }
 
 const HomeScreen = ({navigation}: HomeScreenProps) => {
@@ -38,6 +29,18 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
   const notes = useSelector((state: RootState) => state.notes.notes);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedNote, setSelectedNote] = React.useState<Note | null>(null);
+
+  const handleFabPress = () => {
+    setSelectedNote({
+      id: Date.now().toString(),
+      title: '',
+      content: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      imageUrls: [],
+    });
+    setModalVisible(true);
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
@@ -96,21 +99,7 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
           </>
         )}
       </View>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => {
-          const id = Date.now().toString();
-          dispatch(
-            addNote({
-              id,
-              title: 'New Note',
-              content: 'This is a new note.',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              imageUrls: [],
-            }),
-          );
-        }}>
+      <TouchableOpacity style={styles.fab} onPress={handleFabPress}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
       <NoteEditModal
@@ -118,9 +107,14 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         note={selectedNote}
         onClose={() => setModalVisible(false)}
         onSave={updatedNote => {
-          dispatch(updateNote(updatedNote));
+          if (!notes.find(n => n.id === updatedNote.id)) {
+            dispatch(addNote(updatedNote));
+          } else {
+            dispatch(updateNote(updatedNote));
+          }
           setModalVisible(false);
         }}
+        newNote={!!selectedNote && !notes.find(n => n.id === selectedNote.id)}
         onDelete={() => {
           dispatch(deleteNote(selectedNote?.id || ''));
           setModalVisible(false);

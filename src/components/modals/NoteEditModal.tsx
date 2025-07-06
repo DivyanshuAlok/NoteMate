@@ -15,6 +15,7 @@ import {Note} from '../../redux/slices/noteSlice';
 interface NoteEditModalProps {
   visible: boolean;
   note: Note | null;
+  newNote?: boolean; // Optional prop to indicate if it's a new note
   onClose: () => void;
   onSave: (note: Note) => void;
   onDelete: () => void;
@@ -23,6 +24,7 @@ interface NoteEditModalProps {
 const NoteEditModal: React.FC<NoteEditModalProps> = ({
   visible,
   note,
+  newNote = false, // Default to false if not provided
   onClose,
   onSave,
   onDelete,
@@ -99,7 +101,9 @@ const NoteEditModal: React.FC<NoteEditModalProps> = ({
           <View style={styles.buttonRow}>
             <View style={styles.rowGap}>
               <Button title="Cancel" onPress={onClose} color="#888" />
-              <Button title="Delete" onPress={handleDelete} color="#f00" />
+              {!newNote && (
+                <Button title="Delete" onPress={handleDelete} color="#f00" />
+              )}
             </View>
 
             <Button
