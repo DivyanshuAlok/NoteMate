@@ -7,6 +7,8 @@ import {
   TextInput,
   Dimensions,
   SafeAreaView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 import {login} from '../redux/slices/authSlice';
@@ -30,47 +32,57 @@ const LoginScreen = ({navigation}: LoginScreenProps) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Login Screen</Text>
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        style={styles.input}
-      />
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={[styles.input, {marginBottom: 20}]}
-      />
-      <View style={styles.button}>
-        <Button title="Login" onPress={handleLogin} />
-      </View>
-      <View style={styles.signupButton}>
-        <Button
-          title="Sign Up"
-          onPress={() => {
-            navigation.navigate('SignUp');
-          }}
-          color="#888"
-        />
-      </View>
+    <SafeAreaView style={{flex: 1}}>
+      <TouchableWithoutFeedback style={{flex: 1}} onPress={Keyboard.dismiss}>
+        <View style={styles.outerContainer}>
+          <View style={styles.innerContainer}>
+            <Text style={styles.title}>Login Screen</Text>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.input}
+            />
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={[styles.input, {marginBottom: 20}]}
+            />
+            <View style={styles.button}>
+              <Button title="Login" onPress={handleLogin} />
+            </View>
+            <View style={styles.signupButton}>
+              <Button
+                title="Sign Up"
+                onPress={() => {
+                  navigation.navigate('SignUp');
+                }}
+                color="#888"
+              />
+            </View>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
+    flex: 1,
+    paddingBottom: Dimensions.get('window').height * 0.15,
+    width: '100%',
+  },
+  innerContainer: {
     flex: 1,
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom: Dimensions.get('window').height * 0.15, // 10% bottom indent},
   },
   input: {
     width: screenWidth * 0.75,
