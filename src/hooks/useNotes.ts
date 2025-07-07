@@ -1,4 +1,9 @@
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import {getNotes, createNote, updateNote, deleteNote} from '../api/notes';
 import {Note} from '../redux/slices/noteSlice';
 
@@ -7,12 +12,22 @@ type UpdateNoteInput = {
   data: Partial<Note>;
 };
 
-export const useNotes = () => {
-  return useQuery<Note[]>({
+// export const useNotes = () => {
+//   return useQuery<Note[]>({
+//     queryKey: ['notes'],
+//     queryFn: getNotes,
+//   });
+// };
+
+export const usePaginatedNotes = () =>
+  useInfiniteQuery({
     queryKey: ['notes'],
     queryFn: getNotes,
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      return lastPage.hasMore ? lastPage.page + 1 : undefined;
+    },
   });
-};
 
 export const useCreateNote = () => {
   const queryClient = useQueryClient();

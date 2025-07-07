@@ -21,8 +21,8 @@ import NoteEditModal from '../components/modals/NoteEditModal';
 import {
   useCreateNote,
   useDeleteNote,
-  useNotes,
   useUpdateNote,
+  usePaginatedNotes,
 } from '../hooks/useNotes';
 import {ScrollView} from 'react-native-gesture-handler';
 
@@ -38,7 +38,10 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
   const {mutate: createNote} = useCreateNote();
   const {mutate: updateNote} = useUpdateNote();
   const {mutate: deleteNote} = useDeleteNote();
-  const {data: notes, isLoading} = useNotes();
+  //pagination
+  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} =
+    usePaginatedNotes();
+  const notes = data?.pages.flatMap(page => page.notes) || [];
 
   const handleFabPress = () => {
     setSelectedNote({
@@ -109,6 +112,23 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
                     />
                   </TouchableOpacity>
                 ))}
+                {hasNextPage && (
+                  <TouchableOpacity
+                    onPress={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    style={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 24,
+                      backgroundColor: isFetchingNextPage ? '#ccc' : '#2196f3',
+                      borderRadius: 8,
+                      marginTop: 16,
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{color: '#fff', fontSize: 16}}>
+                      {isFetchingNextPage ? 'Loading more...' : 'Load more'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
               <View style={{height: 120}} />
             </>

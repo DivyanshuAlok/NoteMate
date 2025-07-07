@@ -9,8 +9,13 @@ type NoteInput = {
   imageUrls?: string[];
 };
 
-export const getNotes = async () => {
-  const response = await api.get('/notes');
+export const getNotes = async ({pageParam = 1}) => {
+  const response = await api.get('/notes', {
+    params: {
+      page: pageParam,
+      limit: 20,
+    },
+  });
   return response.data;
 };
 
