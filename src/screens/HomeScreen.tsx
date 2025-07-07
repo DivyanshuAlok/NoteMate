@@ -8,36 +8,52 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import {
-  View,
-  Text,
-  Button,
-  TextInput,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
 import NoteCard from '../components/NoteCard';
-import {addNote, deleteNote, Note, updateNote} from '../redux/slices/noteSlice';
+import {Note} from '../redux/slices/noteSlice';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NoteEditModal from '../components/modals/NoteEditModal';
+import {
+  useCreateNote,
+  useDeleteNote,
+  useUpdateNote,
+  usePaginatedNotes,
+} from '../hooks/useNotes';
+import {ScrollView} from 'react-native-gesture-handler';
 
 interface HomeScreenProps {
-  navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
 }
 
 const HomeScreen = ({navigation}: HomeScreenProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const notes = useSelector((state: RootState) => state.notes.notes);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedNote, setSelectedNote] = React.useState<Note | null>(null);
+  const {mutate: createNote} = useCreateNote();
+  const {mutate: updateNote} = useUpdateNote();
+  const {mutate: deleteNote} = useDeleteNote();
+  //pagination
+  const {data, fetchNextPage, hasNextPage, isFetchingNextPage, status} =
+    usePaginatedNotes();
+  const notes = data?.pages.flatMap(page => page.notes) || [];
+
+  const handleFabPress = () => {
+    setSelectedNote({
+      id: Date.now().toString(),
+      title: '',
+      content: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      imageUrls: [],
+    });
+    setModalVisible(true);
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
@@ -61,56 +77,65 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
           />
         </TouchableOpacity>
       </View>
-      <View style={{flex: 1, alignItems: 'center', paddingVertical: 16}}>
-        {notes.length === 0 ? (
-          <View
-            style={{alignItems: 'center', justifyContent: 'center', flex: 0.8}}>
-            <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
-              No notes here, please add a note.
-            </Text>
-          </View>
-        ) : (
-          <>
+      <ScrollView>
+        <View style={{flex: 1, alignItems: 'center', paddingVertical: 16}}>
+          {notes && notes.length === 0 ? (
             <View
               style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
+                alignItems: 'center',
                 justifyContent: 'center',
+                flex: 0.8,
               }}>
-              {notes.map(note => (
-                <TouchableOpacity
-                  key={note.id}
-                  onPress={() => {
-                    setSelectedNote(note);
-                    setModalVisible(true);
-                  }}>
-                  <NoteCard
-                    title={note.title}
-                    content={note.content}
-                    imageUrls={note.imageUrls || []}
-                  />
-                </TouchableOpacity>
-              ))}
+              <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
+                No notes here, please add a note.
+              </Text>
             </View>
-            <View style={{height: 120}} />
-          </>
-        )}
-      </View>
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => {
-          const id = Date.now().toString();
-          dispatch(
-            addNote({
-              id,
-              title: 'New Note',
-              content: 'This is a new note.',
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              imageUrls: [],
-            }),
-          );
-        }}>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                }}>
+                {notes?.map(note => (
+                  <TouchableOpacity
+                    key={note.id}
+                    onPress={() => {
+                      setSelectedNote(note);
+                      setModalVisible(true);
+                    }}>
+                    <NoteCard
+                      title={note.title}
+                      content={note.content}
+                      imageUrls={note.imageUrls || []}
+                    />
+                  </TouchableOpacity>
+                ))}
+                {hasNextPage && (
+                  <TouchableOpacity
+                    onPress={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    style={{
+                      paddingVertical: 10,
+                      paddingHorizontal: 24,
+                      backgroundColor: isFetchingNextPage ? '#ccc' : '#2196f3',
+                      borderRadius: 8,
+                      marginTop: 16,
+                      alignItems: 'center',
+                    }}>
+                    <Text style={{color: '#fff', fontSize: 16}}>
+                      {isFetchingNextPage ? 'Loading more...' : 'Load more'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={{height: 120}} />
+            </>
+          )}
+        </View>
+      </ScrollView>
+      <TouchableOpacity style={styles.fab} onPress={handleFabPress}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
       <NoteEditModal
@@ -118,11 +143,19 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         note={selectedNote}
         onClose={() => setModalVisible(false)}
         onSave={updatedNote => {
-          dispatch(updateNote(updatedNote));
+          if (!notes?.find(n => n.id === updatedNote.id)) {
+            createNote(updatedNote);
+          } else {
+            updateNote({
+              id: updatedNote.id,
+              data: updatedNote,
+            });
+          }
           setModalVisible(false);
         }}
+        newNote={!!selectedNote && !notes?.find(n => n.id === selectedNote.id)}
         onDelete={() => {
-          dispatch(deleteNote(selectedNote?.id || ''));
+          deleteNote(selectedNote?.id || '');
           setModalVisible(false);
         }}
       />
