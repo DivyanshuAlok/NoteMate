@@ -3,7 +3,7 @@ import {useMutation, useQueryClient} from '@tanstack/react-query';
 import * as Keychain from 'react-native-keychain';
 import {authApi} from '../api/auth';
 import {useDispatch} from 'react-redux';
-import {setAuth} from '../redux/slices/authSlice'; // a new reducer we'll define
+import {setAuth, setUser} from '../redux/slices/authSlice'; // a new reducer we'll define
 
 export const useLogin = () => {
   const dispatch = useDispatch();
@@ -28,8 +28,8 @@ export const useLogin = () => {
       return data;
     },
     onSuccess: data => {
-      dispatch(setAuth({token: data.token, user: data.user}));
-      // queryClient.invalidateQueries(['profile']); // auto-fetch profile if using useQuery
+      dispatch(setAuth({token: data.token}));
+      dispatch(setUser(data.user));
     },
   });
 };

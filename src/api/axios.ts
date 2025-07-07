@@ -35,7 +35,8 @@ api.interceptors.response.use(
 
         const data = await refreshTokenApi(refreshToken);
         await Keychain.setGenericPassword('jwt', data.token);
-        store.dispatch(setAuth({token: data.token, user: null}));
+
+        store.dispatch(setAuth({token: data.token}));
 
         originalRequest.headers.Authorization = `Bearer ${data.token}`;
         return api(originalRequest);

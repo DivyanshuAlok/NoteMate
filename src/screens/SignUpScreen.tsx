@@ -30,6 +30,7 @@ const screenWidth = Dimensions.get('window').width;
 const SignUpScreen = ({navigation}: SignUpScreenProps) => {
   const [email, setEmail] = useState('testuser@example.com');
   const [password, setPassword] = useState('Test@1234');
+  const [name, setName] = useState('John Doe');
   const [confirmPassword, setConfirmPassword] = useState('Test@1234');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -56,7 +57,7 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
     }
     if (!valid) return;
     try {
-      await signUpMutation.mutateAsync({email, password});
+      await signUpMutation.mutateAsync({name, email, password});
       navigation.replace('Login');
     } catch (err: any) {
       setEmailError(err.message || 'Sign up failed');
@@ -91,7 +92,14 @@ const SignUpScreen = ({navigation}: SignUpScreenProps) => {
                 />
               )}
             </View>
-
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              placeholder="Your Name"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              style={styles.input}
+            />
             <Text style={styles.label}>Email</Text>
             <TextInput
               placeholder="Email"

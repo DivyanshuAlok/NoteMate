@@ -5,9 +5,11 @@ import {signUpApi} from '../api/auth';
 export const useSignUp = () => {
   return useMutation({
     mutationFn: async ({
+      name,
       email,
       password,
     }: {
+      name: string;
       email: string;
       password: string;
     }) => {
@@ -15,7 +17,7 @@ export const useSignUp = () => {
       if (!netState.isConnected) {
         throw new Error('No internet connection');
       }
-      return signUpApi(email, password);
+      return signUpApi(name, email, password);
     },
   });
 };

@@ -21,8 +21,8 @@ interface ProfilePageProps {
 const ProfilePage = ({navigation}: ProfilePageProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+
   // Placeholder name and photo
-  const name = user ? user.split('@')[0] : 'User';
   const photoUrl = 'https://randomuser.me/api/portraits/men/1.jpg';
   return (
     <SafeAreaView style={styles.container}>
@@ -32,9 +32,9 @@ const ProfilePage = ({navigation}: ProfilePageProps) => {
         <Text style={styles.menuIcon}>☰</Text>
       </TouchableOpacity>
       <Image source={{uri: photoUrl}} style={styles.profilePic} />
-      <Text style={styles.name}>{name}</Text>
-      <Text style={styles.label}>Email:</Text>
-      <Text style={styles.value}>{user}</Text>
+      <Text style={styles.name}>{user?.name}</Text>
+      <Text style={styles.label}>Email: {user?.email}</Text>
+      {/* <Text style={styles.value}>{user}</Text> */}
       <Text style={{marginTop: 32}} />
       <Button title="Logout" onPress={() => dispatch(logout())} />
     </SafeAreaView>
