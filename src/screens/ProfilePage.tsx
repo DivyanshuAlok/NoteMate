@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,23 +7,96 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
+  PermissionsAndroid,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/store';
 import {logout} from '../redux/slices/authSlice';
 import type {AppDrawerParamList} from '../navigation/types';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
+import {
+  launchCamera,
+  launchImageLibrary,
+  MediaType,
+} from 'react-native-image-picker';
+
+const photoUrl = 'https://randomuser.me/api/portraits/men/1.jpg';
 
 interface ProfilePageProps {
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Profile'>;
 }
 
+const requestCameraPermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      {
+        title: 'Camera Permission',
+        message: 'App needs access to your camera ',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can use the camera');
+    } else {
+      console.log('Camera permission denied');
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
+
+const requestStoragePermission = async () => {
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      {
+        title: 'Storage Permission',
+        message: 'App needs access to your storage to read photos.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      console.log('You can access storage');
+    } else {
+      console.log('Storage permission denied');
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+};
+
 const ProfilePage = ({navigation}: ProfilePageProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
+  const [profilePic, setProfilePic] = useState(photoUrl);
+
+  const openImagePicker = async () => {
+    await requestCameraPermission();
+    await requestStoragePermission();
+
+    // Proceed with image picking if permissions are granted
+    let options = {
+      mediaType: 'photo' as MediaType,
+
+      // Other options like maxWidth, maxHeight, quality, etc. can be added here.
+    };
+
+    launchImageLibrary(options, res => {
+      // Handle the response
+      setProfilePic(res?.assets[0]?.uri!);
+    });
+    // launchCamera(options, res => {
+    //   console.log(res.assets);
+    //   setProfilePic(res?.assets[0]?.uri!);
+    // });
+  };
 
   // Placeholder name and photo
-  const photoUrl = 'https://randomuser.me/api/portraits/men/1.jpg';
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
@@ -31,7 +104,11 @@ const ProfilePage = ({navigation}: ProfilePageProps) => {
         onPress={() => navigation.toggleDrawer()}>
         <Text style={styles.menuIcon}>☰</Text>
       </TouchableOpacity>
-      <Image source={{uri: photoUrl}} style={styles.profilePic} />
+
+      <TouchableOpacity onPress={openImagePicker}>
+        <Image source={{uri: profilePic}} style={styles.profilePic} />
+      </TouchableOpacity>
+
       <Text style={styles.name}>{user?.name}</Text>
       <Text style={styles.label}>Email: {user?.email}</Text>
       {/* <Text style={styles.value}>{user}</Text> */}

@@ -2584,25 +2584,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/drawer@npm:6.7.2":
-  version: 6.7.2
-  resolution: "@react-navigation/drawer@npm:6.7.2"
-  dependencies:
-    "@react-navigation/elements": ^1.3.31
-    color: ^4.2.3
-    warn-once: ^0.1.0
-  peerDependencies:
-    "@react-navigation/native": ^6.0.0
-    react: "*"
-    react-native: "*"
-    react-native-gesture-handler: ">= 1.0.0"
-    react-native-reanimated: ">= 1.0.0"
-    react-native-safe-area-context: ">= 3.0.0"
-    react-native-screens: ">= 3.0.0"
-  checksum: 6c5b0b118dad5a94141804a1685497464cd9a03cfa426888a8b4027a12898ba3b853fba9bd327cfb8733ffbb94546d612fdcf69fe1eb1bc45a46e14d77aaec82
-  languageName: node
-  linkType: hard
-
 "@react-navigation/elements@npm:^1.3.31":
   version: 1.3.31
   resolution: "@react-navigation/elements@npm:1.3.31"
@@ -3170,7 +3151,6 @@ __metadata:
     "@react-native/metro-config": 0.75.3
     "@react-native/typescript-config": 0.75.3
     "@react-navigation/drawer": 6.7.2
-    "@react-navigation/drawer": 6.7.2
     "@react-navigation/native": 6.1.18
     "@react-navigation/stack": 6.4.1
     "@reduxjs/toolkit": ^2.8.2
@@ -3186,6 +3166,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.75.5
     react-native-gesture-handler: 2.20.0
+    react-native-image-picker: ^8.2.1
     react-native-keychain: ^10.0.0
     react-native-reanimated: 3.16.1
     react-native-safe-area-context: 4.11.1
@@ -8339,6 +8320,16 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: f573bc3717ae0209ff30bf62b95b3c7f11bd97f4797090211bce416c250388f55d1995aac0a7f1bbc99b06223ea64cbeae8d4ef88dcb8c877201b49163ea0e4b
+  languageName: node
+  linkType: hard
+
+"react-native-image-picker@npm:^8.2.1":
+  version: 8.2.1
+  resolution: "react-native-image-picker@npm:8.2.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: fc85bc278c0ba5ccef8cbacfce3001e994b34b0895be34e0c884021d2215802c2e553c5e97ff7f21a30e502be60000f90cf9555e9c2a19c71fdc76120d30e158
   languageName: node
   linkType: hard
 

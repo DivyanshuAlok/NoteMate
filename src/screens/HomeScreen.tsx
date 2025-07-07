@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
-import {logout} from '../redux/slices/authSlice';
 import {RootState} from '../redux/store';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
