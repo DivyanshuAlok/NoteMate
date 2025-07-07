@@ -14,7 +14,7 @@ export const getNotes = async () => {
   return response.data;
 };
 
-export const createNote = async (note: NoteInput) => {
+export const createNote = async (note: Note) => {
   const response = await api.post('/notes', note);
   return response.data;
 };

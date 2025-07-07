@@ -15,9 +15,16 @@ import {RootState} from '../redux/store';
 import type {DrawerNavigationProp} from '@react-navigation/drawer';
 import type {AppDrawerParamList} from '../navigation/types';
 import NoteCard from '../components/NoteCard';
-import {addNote, deleteNote, Note, updateNote} from '../redux/slices/noteSlice';
+import {Note} from '../redux/slices/noteSlice';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import NoteEditModal from '../components/modals/NoteEditModal';
+import {
+  useCreateNote,
+  useDeleteNote,
+  useNotes,
+  useUpdateNote,
+} from '../hooks/useNotes';
+import {ScrollView} from 'react-native-gesture-handler';
 
 interface HomeScreenProps {
   navigation: DrawerNavigationProp<AppDrawerParamList, 'Home'>;
@@ -26,9 +33,12 @@ interface HomeScreenProps {
 const HomeScreen = ({navigation}: HomeScreenProps) => {
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-  const notes = useSelector((state: RootState) => state.notes.notes);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [selectedNote, setSelectedNote] = React.useState<Note | null>(null);
+  const {mutate: createNote} = useCreateNote();
+  const {mutate: updateNote} = useUpdateNote();
+  const {mutate: deleteNote} = useDeleteNote();
+  const {data: notes, isLoading} = useNotes();
 
   const handleFabPress = () => {
     setSelectedNote({
@@ -64,41 +74,47 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
           />
         </TouchableOpacity>
       </View>
-      <View style={{flex: 1, alignItems: 'center', paddingVertical: 16}}>
-        {notes.length === 0 ? (
-          <View
-            style={{alignItems: 'center', justifyContent: 'center', flex: 0.8}}>
-            <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
-              No notes here, please add a note.
-            </Text>
-          </View>
-        ) : (
-          <>
+      <ScrollView>
+        <View style={{flex: 1, alignItems: 'center', paddingVertical: 16}}>
+          {notes && notes.length === 0 ? (
             <View
               style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
+                alignItems: 'center',
                 justifyContent: 'center',
+                flex: 0.8,
               }}>
-              {notes.map(note => (
-                <TouchableOpacity
-                  key={note.id}
-                  onPress={() => {
-                    setSelectedNote(note);
-                    setModalVisible(true);
-                  }}>
-                  <NoteCard
-                    title={note.title}
-                    content={note.content}
-                    imageUrls={note.imageUrls || []}
-                  />
-                </TouchableOpacity>
-              ))}
+              <Text style={{color: '#888', fontSize: 18, marginTop: 32}}>
+                No notes here, please add a note.
+              </Text>
             </View>
-            <View style={{height: 120}} />
-          </>
-        )}
-      </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                }}>
+                {notes?.map(note => (
+                  <TouchableOpacity
+                    key={note.id}
+                    onPress={() => {
+                      setSelectedNote(note);
+                      setModalVisible(true);
+                    }}>
+                    <NoteCard
+                      title={note.title}
+                      content={note.content}
+                      imageUrls={note.imageUrls || []}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={{height: 120}} />
+            </>
+          )}
+        </View>
+      </ScrollView>
       <TouchableOpacity style={styles.fab} onPress={handleFabPress}>
         <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
@@ -107,16 +123,19 @@ const HomeScreen = ({navigation}: HomeScreenProps) => {
         note={selectedNote}
         onClose={() => setModalVisible(false)}
         onSave={updatedNote => {
-          if (!notes.find(n => n.id === updatedNote.id)) {
-            dispatch(addNote(updatedNote));
+          if (!notes?.find(n => n.id === updatedNote.id)) {
+            createNote(updatedNote);
           } else {
-            dispatch(updateNote(updatedNote));
+            updateNote({
+              id: updatedNote.id,
+              data: updatedNote,
+            });
           }
           setModalVisible(false);
         }}
-        newNote={!!selectedNote && !notes.find(n => n.id === selectedNote.id)}
+        newNote={!!selectedNote && !notes?.find(n => n.id === selectedNote.id)}
         onDelete={() => {
-          dispatch(deleteNote(selectedNote?.id || ''));
+          deleteNote(selectedNote?.id || '');
           setModalVisible(false);
         }}
       />
