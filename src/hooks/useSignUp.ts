@@ -19,5 +19,9 @@ export const useSignUp = () => {
       }
       return signUpApi(name, email, password);
     },
+    onError: (error: any) => {
+      console.log('Sign Up error:', error.message);
+      // Optionally: show error toast or update some error state here
+    },
   });
 };

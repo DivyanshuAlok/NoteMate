@@ -24,12 +24,15 @@ export const useLogin = () => {
       if (data.refreshToken) {
         await Keychain.setGenericPassword('refreshToken', data.refreshToken);
       }
-
       return data;
     },
     onSuccess: data => {
       dispatch(setAuth({token: data.token}));
       dispatch(setUser(data.user));
+    },
+    onError: (error: any) => {
+      console.log('Login error:', error.message);
+      // Optionally: show error toast or update some error state here
     },
   });
 };

@@ -15,7 +15,6 @@ import {useDispatch} from 'react-redux';
 import type {AppDispatch} from '../redux/store';
 import type {AuthStackParamList} from '../navigation/types';
 import type {StackNavigationProp} from '@react-navigation/stack';
-import {loginThunk} from '../redux/authThunks';
 import {useLogin} from '../hooks/useLogin';
 
 interface LoginScreenProps {
